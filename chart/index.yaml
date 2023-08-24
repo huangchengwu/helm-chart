@@ -3,23 +3,23 @@ entries:
   mysql:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2023-08-24T11:28:20.610309+08:00"
+    created: "2023-08-24T11:56:30.404604+08:00"
     description: A Helm chart for Kubernetes
     digest: b6388845dd06d1927c45eda39f0ba8eac6d191d7b792278f2c9a0378cad3d564
     name: mysql
     type: application
     urls:
-    - https://huangchengwu.github.io/helm-chart/mysql-0.1.0.tgz
+    - https://huangchengwu.github.io/helm-chart/chart/mysql-0.1.0.tgz
     version: 0.1.0
   redis:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2023-08-24T11:28:20.610731+08:00"
+    created: "2023-08-24T11:56:30.404766+08:00"
     description: A Helm chart for Kubernetes
     digest: 33bc3c986320c76bcb9595f9d14187351538994564e1c7f22cdc920be0ffb8a6
     name: redis
     type: application
     urls:
-    - https://huangchengwu.github.io/helm-chart/redis-0.1.0.tgz
+    - https://huangchengwu.github.io/helm-chart/chart/redis-0.1.0.tgz
     version: 0.1.0
-generated: "2023-08-24T11:28:20.607607+08:00"
+generated: "2023-08-24T11:56:30.404294+08:00"
