@@ -15,20 +15,20 @@ spec:
     spec:
       containers:
         - name: mysql
-          image: {{ .Values.mysql.image }}
+          image: {{ .Values.image }}
           ports:
             - containerPort: 3306
           env:
             - name: TZ
               value: "Asia/Shanghai"
             - name: MYSQL_ROOT_PASSWORD
-              value: {{ .Values.mysql.root_pass}}
+              value: {{ .Values.root_pass}}
             - name: MYSQL_DATABASE
-              value: {{ .Values.mysql.database}}
+              value: {{ .Values.database}}
             - name: MYSQL_USER
-              value: {{ .Values.mysql.user}}
+              value: {{ .Values.user}}
             - name: MYSQL_PASSWORD
-              value: {{ .Values.mysql.password }}
+              value: {{ .Values.password }}
           volumeMounts:
             - name: mysql-persistent-storage
               mountPath: /var/lib/mysql
