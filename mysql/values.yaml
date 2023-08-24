@@ -1,0 +1,14 @@
+
+storageClassName: csi-cephfs-sc
+mysql:
+  image: mysql:8.0.19
+  storage: 8Gi
+  user: huangchengwu
+  password: 123456
+  database: test
+  root_pass: root
+  port: 3306 
+
+
+
+
