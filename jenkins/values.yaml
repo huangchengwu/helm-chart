@@ -1,0 +1,4 @@
+storageClassName: csi-cephrdb-sc1
+image: huangchengwu6904/hi-app:jenkins-cicd
+storageSite: 50Gi
+nodeName: "k8s-1"

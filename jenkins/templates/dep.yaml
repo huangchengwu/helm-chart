@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jenkins
+  namespace: {{ .Release.Namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jenkins
+  template:
+    metadata:
+      labels:
+        app: jenkins
+    spec:
+      volumes:
+        - name: jenkins-data
+          hostPath:
+            path: /var/jenkins_home
+            type: ''
+        - name: docker-data
+          hostPath:
+            path: /var/run/docker/containerd/
+            type: ''
+      initContainers:
+        - name: init-container
+          image: ubuntu
+          command:
+            - sh
+            - '-c'
+            - '-x'
+            - |
+              chown -R 1000.1000 /var/jenkins_home
+          resources: {}
+          volumeMounts:
+            - name: jenkins-data
+              mountPath: /var/jenkins_home
+          imagePullPolicy: Always
+          securityContext:
+            privileged: true
+      containers:
+        - name: jenkins
+          image: huangchengwu6904/hi-app:jenkins-cicd
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          volumeMounts:
+            - name: jenkins-data
+              mountPath: /var/jenkins_home
+          securityContext:
+            privileged: true
+      nodeName: {{ .Values.nodeName }}
