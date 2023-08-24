@@ -6,3 +6,6 @@ build:
 	helm package redis
 	mv *.tgz chart
 	helm repo index chart --url https://huangchengwu.github.io/helm-chart/chart
+	git add *
+	git commit -m "add"
+	git push -f 
