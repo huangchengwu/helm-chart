@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nexus3
+  namespace: {{ .Release.Namespace }}
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nexus3
+  template:
+    metadata:
+      labels:
+        app: nexus3
+    spec:
+      securityContext:
+        runAsUser: 200
+        runAsGroup: 200
+        fsGroup: 200
+
+      containers:
+        - name: nexus3
+          image: {{ .Values.image }} 
+          ports:
+            - containerPort: 8081
+            - containerPort: 8001
+            - containerPort: 8002
+            - containerPort: 8003
+
+          volumeMounts:
+            - name: nexus3-data
+              mountPath: /nexus-data
+              subPathExpr: "nexus-data2/{200}:{200}"
+
+
+      volumes:
+        - name: nexus3-data
+          persistentVolumeClaim:
+            claimName: nexus3-pvc
+
