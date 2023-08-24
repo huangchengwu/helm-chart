@@ -17,8 +17,8 @@ spec:
       containers:
         - name: redis
           command: ["redis-server"]
-          args: ["--requirepass", "{{ .Values.redis.password }}"]
-          image:  {{ .Values.redis.image }}
+          args: ["--requirepass", "{{ .Values.password }}"]
+          image:  {{ .Values.image }}
           env:
             - name: TZ
               value: Asia/Shanghai

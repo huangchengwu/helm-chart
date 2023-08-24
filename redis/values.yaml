@@ -1,7 +1,6 @@
 storageClassName:   csi-cephfs-sc
-redis:
-  image: redis:alpine
-  storage: 8Gi
-  password: 123456
+image: redis:alpine
+storageSite: 8Gi
+password: '123.com'
 
 
