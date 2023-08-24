@@ -5,6 +5,7 @@ rm -rf *.tgz
 
 for k in $(ls -l | grep -v -E "chart|make|README.md" | awk '{print \$9}'); do
     helm package $k
+    sleep 1000
 done
 mv *.tgz chart
 helm repo index chart --url https://huangchengwu.github.io/helm-chart/chart
