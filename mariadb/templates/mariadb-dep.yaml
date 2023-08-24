@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mariadb
+  namespace: {{ .Release.Namespace }}
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mariadb
+  template:
+    metadata:
+      labels:
+        app: mariadb
+    spec:
+      volumes:
+        - name: mariadb-persistent-storage
+          persistentVolumeClaim:
+            claimName: mariadb-pvc
+        - name: my-cnf
+          configMap:
+            name: conf
+            items:
+              - key: my.cnf
+                path: my.cnf
+        - name: repassword-sh
+          configMap:
+            name: conf
+            items:
+              - key: repassword.sh
+                path: repassword.sh
+      containers:
+        - name: mariadb
+          image: {{ .Values.image }}
+          ports:
+            - containerPort: 3306
+              protocol: TCP
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: "123456"
+            - name: MYSQL_DATABASE
+              value: neutron
+            - name: MYSQL_USER
+              value: neutron
+            - name: MYSQL_PASSWORD
+              value: neutron
+              
+          volumeMounts:
+            - name: mariadb-persistent-storage
+              mountPath: /var/lib/mysql
+            - name: my-cnf
+              mountPath: /etc/mysql/conf.d/my.cnf
+              subPath: my.cnf
+          imagePullPolicy: Always
+      restartPolicy: Always

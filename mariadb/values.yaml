@@ -1,0 +1,9 @@
+timeZone: Asia/Shanghai
+LANG: C.UTF-8
+storageClassName:  csi-cephfs-sc
+
+image: mariadb:latest
+storageSite: 10Gi
+user: "root"
+password: "123456"
+database: "neutron"

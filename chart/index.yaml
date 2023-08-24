@@ -1,11 +1,22 @@
 apiVersion: v1
 entries:
+  mariadb:
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2023-08-24T14:38:09.247522+08:00"
+    description: A Helm chart for Kubernetes
+    digest: a1f119098951c4f300745fc1b200256ba3dd7af930595e7f5cd0253962a9049b
+    name: mariadb
+    type: application
+    urls:
+    - https://huangchengwu.github.io/helm-chart/chart/mariadb-0.1.0.tgz
+    version: 0.1.0
   mysql:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2023-08-24T14:36:19.377264+08:00"
+    created: "2023-08-24T14:38:09.247797+08:00"
     description: A Helm chart for Kubernetes
-    digest: c8db15dcde52e75fc46add7d65e59800f15924e8f6e2a2159f0e77cdddd64dd3
+    digest: 49227055d734aa4f1b1840dfe0ad02783a6db6fcbf00f7fd5dae20a249712be8
     name: mysql
     type: application
     urls:
@@ -14,9 +25,9 @@ entries:
   nexus3:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2023-08-24T14:36:19.377442+08:00"
+    created: "2023-08-24T14:38:09.24802+08:00"
     description: A Helm chart for Kubernetes
-    digest: 0a4947b64794b4a9c974b615eeb623c7af26343b7b283842c18fa53a8bca2487
+    digest: da2c1a39c86a4ee6e0ec5e783e618b4d513e2251d94a81c3d813303f2cd66da3
     name: nexus3
     type: application
     urls:
@@ -25,12 +36,12 @@ entries:
   redis:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2023-08-24T14:36:19.377626+08:00"
+    created: "2023-08-24T14:38:09.248178+08:00"
     description: A Helm chart for Kubernetes
-    digest: e305b6e31587ae7e7762eb3608195aa2ba51f340396d1c133f463a9b61a38cc8
+    digest: 5ab6a9faa9f6838b3093d41c409446e093f7781fc08c791a833e06c43dae4126
     name: redis
     type: application
     urls:
     - https://huangchengwu.github.io/helm-chart/chart/redis-0.1.0.tgz
     version: 0.1.0
-generated: "2023-08-24T14:36:19.375832+08:00"
+generated: "2023-08-24T14:38:09.246718+08:00"
