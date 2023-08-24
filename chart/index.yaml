@@ -3,9 +3,9 @@ entries:
   jenkins:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2023-08-24T15:04:49.466344+08:00"
+    created: "2023-08-24T15:27:20.677058+08:00"
     description: A Helm chart for Kubernetes
-    digest: 5a3477e2d76e402c8adf6aafe36ecce6e3a236a0635d4bfa3e9ba8afdb3033ec
+    digest: e521066c7975fd12787b6dabf9dfe3023a2bdf75476c53f4a0343568d142ccb2
     name: jenkins
     type: application
     urls:
@@ -14,9 +14,9 @@ entries:
   mariadb:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2023-08-24T15:04:49.466549+08:00"
+    created: "2023-08-24T15:27:20.677234+08:00"
     description: A Helm chart for Kubernetes
-    digest: 11c6bcd8cedc26bcd79ee2551a395ce53c40d931c67c038b7243bd9976141235
+    digest: 2f43e902c5c565fd848c43c02723e7530ee24107f27fcc26aa4713fede8d32d9
     name: mariadb
     type: application
     urls:
@@ -25,9 +25,9 @@ entries:
   mysql:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2023-08-24T15:04:49.466734+08:00"
+    created: "2023-08-24T15:27:20.677399+08:00"
     description: A Helm chart for Kubernetes
-    digest: 5d5ba4283ee9a681f740031a70f926a66fba770af7d0d92b6e8e0ec1b6c46c45
+    digest: 403a45c9482ffd42ec6a4f36a5e5083b3da779b94daed88412ba1687e22ebe2f
     name: mysql
     type: application
     urls:
@@ -36,9 +36,9 @@ entries:
   nexus3:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2023-08-24T15:04:49.466898+08:00"
+    created: "2023-08-24T15:27:20.677547+08:00"
     description: A Helm chart for Kubernetes
-    digest: eb63868623394f2ba56dd166b994bde063ee20be3bfe9df176f18e1a35526236
+    digest: 497a0a06618d431128c03514dcdce6cf45847f4ee4a64d1e83fbdbc28b8e1f92
     name: nexus3
     type: application
     urls:
@@ -47,9 +47,9 @@ entries:
   prometheus:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2023-08-24T15:04:49.46705+08:00"
+    created: "2023-08-24T15:27:20.677711+08:00"
     description: A Helm chart for Kubernetes
-    digest: d1022115376e310a37884789c5f7eb6de0a1f852b3c95fd8c2c08c73d774cc87
+    digest: 459bfc07f3271303a4f2d04fb344d8c5682d0dd5b8a36e099492649e5aaeea91
     name: prometheus
     type: application
     urls:
@@ -58,12 +58,12 @@ entries:
   redis:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2023-08-24T15:04:49.467201+08:00"
+    created: "2023-08-24T15:27:20.677891+08:00"
     description: A Helm chart for Kubernetes
-    digest: be110fc012193f39499ce93c3300a4cd5fb306f86ea3ce9c0cdc024325b38505
+    digest: f7dedab4f72582a00f6ebe42acc9af56df9dfe5ef229f366a8aadc7d42a0412e
     name: redis
     type: application
     urls:
     - https://huangchengwu.github.io/helm-chart/chart/redis-0.1.0.tgz
     version: 0.1.0
-generated: "2023-08-24T15:04:49.465977+08:00"
+generated: "2023-08-24T15:27:20.676759+08:00"

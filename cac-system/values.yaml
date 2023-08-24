@@ -1,0 +1,5 @@
+storageClassName: csi-cephrdb-sc1
+image: cac-system
+storageSite: 50Gi
+cert-manager:  
+  namespace: security

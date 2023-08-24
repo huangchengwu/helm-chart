@@ -1,0 +1,17 @@
+#helm repo add jetstack https://charts.jetstack.io
+#helm repo add metallb  https://metallb.github.io/metallb                 
+apiVersion: v2
+name: prometheus
+description: A Helm chart for Kubernetes
+type: application
+version: 0.1.0
+appVersion: "1.16.0"
+dependencies:
+  - name: metallb
+    version: 0.13.10
+    repository: https://metallb.github.io/metallb
+  - name: cert-manager
+    version: v1.12.0
+    repository: https://charts.jetstack.io
+    alias: cert-manager
+    condition: cert-manager.enabled
