@@ -1,0 +1,123 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: elasticsearch
+  namespace: {{ .Release.Namespace }}
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: elasticsearch
+  template:
+    metadata:
+      labels:
+        app: elasticsearch
+    spec:
+      containers:
+        - name: elasticsearch
+          image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.4.2
+          ports:
+            - containerPort: 9200
+              protocol: TCP
+          env:
+            - name: discovery.type
+              value: single-node
+            - name: bootstrap.memory_lock
+              value: 'true'
+            - name: ES_JAVA_OPTS
+              value: '-Xms512m -Xmx512m'
+          resources:
+            limits:
+              memory: 1Gi
+            requests:
+              memory: 1Gi
+          readinessProbe:
+            exec:
+              command:
+                - sh
+                - '-c'
+                - curl --silent --fail localhost:9200/_cluster/health || exit 1
+            initialDelaySeconds: 30
+            timeoutSeconds: 10
+            periodSeconds: 30
+            successThreshold: 1
+            failureThreshold: 3
+          securityContext:
+            capabilities:
+              add:
+                - IPC_LOCK
+      restartPolicy: Always
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: oap
+  namespace: {{ .Release.Namespace }}
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: oap
+  template:
+    metadata:
+      labels:
+        app: oap
+    spec:
+      volumes:
+        - name: oap-data
+          emptyDir: {}
+      containers:
+        - name: oap
+          image: apache/skywalking-oap-server:9.2.0
+          ports:
+            - containerPort: 12800
+              protocol: TCP
+            - containerPort: 9411
+              protocol: TCP
+          env:
+            - name: SW_STORAGE
+              value: elasticsearch
+            - name: SW_STORAGE_ES_CLUSTER_NODES
+              value: elasticsearch:9200
+          resources: {}
+          volumeMounts:
+            - name: oap-data
+              mountPath: /data
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          imagePullPolicy: IfNotPresent
+      restartPolicy: Always
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: oap-ui
+  namespace: {{ .Release.Namespace }}
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: oap-ui
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: oap-ui
+    spec:
+      containers:
+        - name: oap-ui
+          image: apache/skywalking-ui:9.2.0
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          env:
+            - name: SW_OAP_ADDRESS
+              value: http://oap:12800
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          imagePullPolicy: Always
+      restartPolicy: Always

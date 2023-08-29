@@ -1,0 +1,3 @@
+storageClassName: csi-cephrdb-sc1
+image: pinpoint
+storageSite: 10Gi

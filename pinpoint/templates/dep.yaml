@@ -1,0 +1,83 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pinpoint
+  namespace: {{ .Release.Namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pinpoint
+  template:
+    metadata:
+      labels:
+        app: pinpoint
+    spec:
+      containers:
+        - name: pinpoint
+          image: huangchengwu6904/app:pinpoint-v2.2.2-standalone
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+            - containerPort: 8081
+              protocol: TCP
+            - containerPort: 2181
+              protocol: TCP
+            - containerPort: 16010
+              protocol: TCP
+            - containerPort: 9992
+              protocol: TCP
+            - containerPort: 9993
+              protocol: TCP
+            - containerPort: 9994
+              protocol: TCP
+            - containerPort: 9991
+              protocol: TCP
+      restartPolicy: Always
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pinpoint-collector-agent
+  namespace: {{ .Release.Namespace }}
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pinpoint-collector-agent
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: pinpoint-collector-agent
+    spec:
+      containers:
+        - name: pinpoint-collector-agent
+          image: ghcr.io/pinpoint-apm/pinpoint-c-agent/collector-agent:latest
+          env:
+            - name: PP_COLLECTOR_AGENT_SPAN_IP
+              value: pinpoint-svc
+            - name: PP_COLLECTOR_AGENT_SPAN_PORT
+              value: '9993'
+            - name: PP_COLLECTOR_AGENT_AGENT_IP
+              value: pinpoint-svc
+            - name: PP_COLLECTOR_AGENT_AGENT_PORT
+              value: '9991'
+            - name: PP_COLLECTOR_AGENT_STAT_IP
+              value: pinpoint-svc
+            - name: PP_COLLECTOR_AGENT_STAT_PORT
+              value: '9992'
+            - name: PP_COLLECTOR_AGENT_ISDOCKER
+              value: 'false'
+            - name: PP_LOG_DIR
+              value: /tmp
+            - name: PP_Log_Level
+              value: INFO
+            - name: PP_ADDRESS
+              value: 0.0.0.0@9999
+          resources: {}
+          imagePullPolicy: Always
+      restartPolicy: Always
+

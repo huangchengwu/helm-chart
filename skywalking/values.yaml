@@ -1,0 +1,3 @@
+storageClassName: csi-cephrdb-sc1
+image: skywalking
+storageSite: 10Gi
