@@ -1,5 +1,4 @@
-storageClassName: csi-cephrdb-sc1
-image: cac-system
-storageSite: 50Gi
+image: huangchengwu6904/hi-app:cac-1691047806
 cert-manager:  
   namespace: security
+wan_ip: 103.63.136.102

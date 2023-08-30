@@ -1,9 +1,0 @@
-dependencies:
-- name: metallb
-  repository: https://metallb.github.io/metallb
-  version: 0.13.10
-- name: cert-manager
-  repository: https://charts.jetstack.io
-  version: v1.12.0
-digest: sha256:9c6a7a67ce3aeb05473dfabbbf493d676e03a353753767b044fe2af1ac175e14
-generated: "2023-08-24T15:26:53.486643+08:00"
