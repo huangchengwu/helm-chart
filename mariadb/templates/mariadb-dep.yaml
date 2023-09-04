@@ -18,18 +18,6 @@ spec:
         - name: mariadb-persistent-storage
           persistentVolumeClaim:
             claimName: mariadb-pvc
-        - name: my-cnf
-          configMap:
-            name: conf
-            items:
-              - key: my.cnf
-                path: my.cnf
-        - name: repassword-sh
-          configMap:
-            name: conf
-            items:
-              - key: repassword.sh
-                path: repassword.sh
       containers:
         - name: mariadb
           image: {{ .Values.image }}
@@ -38,19 +26,16 @@ spec:
               protocol: TCP
           env:
             - name: MYSQL_ROOT_PASSWORD
-              value: "123456"
+              value: {{ .Values.password }}
             - name: MYSQL_DATABASE
-              value: neutron
+              value: {{ .Values.database }}
             - name: MYSQL_USER
-              value: neutron
+              value: {{ .Values.user }}
             - name: MYSQL_PASSWORD
-              value: neutron
+              value: {{ .Values.password }}
               
           volumeMounts:
             - name: mariadb-persistent-storage
               mountPath: /var/lib/mysql
-            - name: my-cnf
-              mountPath: /etc/mysql/conf.d/my.cnf
-              subPath: my.cnf
           imagePullPolicy: Always
       restartPolicy: Always

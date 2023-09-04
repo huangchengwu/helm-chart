@@ -9,20 +9,17 @@ metadata:
     app.kubernetes.io/name: namespace
     app.kubernetes.io/part-of: cac
     control-plane: controller-manager
-    kubernetes.io/metadata.name: cac-system
   name: cac-system
-spec:
-  finalizers:
-  - kubernetes
 ---
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
+  annotations:
+    cert-manager.io/inject-ca-from: cac-system/cac-serving-cert
+    controller-gen.kubebuilder.io/version: v0.11.3
+  creationTimestamp: null
   name: cacroutes.cac.keli.vip
-
 spec:
-  conversion:
-    strategy: None
   group: cac.keli.vip
   names:
     kind: CacRoute
@@ -125,25 +122,6 @@ spec:
     storage: true
     subresources:
       status: {}
-status:
-  acceptedNames:
-    kind: CacRoute
-    listKind: CacRouteList
-    plural: cacroutes
-    singular: cacroute
-  conditions:
-  - lastTransitionTime: "2023-08-30T09:32:33Z"
-    message: no conflicts found
-    reason: NoConflicts
-    status: "True"
-    type: NamesAccepted
-  - lastTransitionTime: "2023-08-30T09:32:33Z"
-    message: the initial names have been accepted
-    reason: InitialNamesAccepted
-    status: "True"
-    type: Established
-  storedVersions:
-  - v1
 ---
 apiVersion: v1
 kind: ServiceAccount
@@ -170,7 +148,6 @@ metadata:
     app.kubernetes.io/part-of: cac
   name: cac-leader-election-role
   namespace: cac-system
- 
 rules:
 - apiGroups:
   - ""
@@ -207,6 +184,7 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
+  creationTimestamp: null
   name: cac-manager-role
 rules:
 - apiGroups:
@@ -271,7 +249,6 @@ metadata:
     app.kubernetes.io/name: clusterrole
     app.kubernetes.io/part-of: cac
   name: cac-metrics-reader
-
 rules:
 - nonResourceURLs:
   - /metrics
@@ -378,10 +355,6 @@ metadata:
   name: cac-controller-manager-metrics-service
   namespace: cac-system
 spec:
-  internalTrafficPolicy: Cluster
-  ipFamilies:
-  - IPv4
-  ipFamilyPolicy: SingleStack
   ports:
   - name: https
     port: 8443
@@ -389,10 +362,6 @@ spec:
     targetPort: https
   selector:
     control-plane: controller-manager
-  sessionAffinity: None
-  type: ClusterIP
-status:
-  loadBalancer: {}
 ---
 apiVersion: v1
 kind: Service
@@ -400,6 +369,9 @@ metadata:
   name: cac-service
   namespace: cac-system
 spec:
+  clusterIP: 10.20.144.235
+  clusterIPs:
+  - 10.20.144.235
   internalTrafficPolicy: Cluster
   ipFamilies:
   - IPv4
@@ -412,8 +384,6 @@ spec:
     control-plane: controller-manager
   sessionAffinity: None
   type: ClusterIP
-status:
-  loadBalancer: {}
 ---
 apiVersion: v1
 kind: Service
@@ -428,20 +398,12 @@ metadata:
   name: cac-webhook-service
   namespace: cac-system
 spec:
-  internalTrafficPolicy: Cluster
-  ipFamilies:
-  - IPv4
-  ipFamilyPolicy: SingleStack
   ports:
   - port: 443
     protocol: TCP
     targetPort: 9443
   selector:
     control-plane: controller-manager
-  sessionAffinity: None
-  type: ClusterIP
-status:
-  loadBalancer: {}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -454,26 +416,17 @@ metadata:
     app.kubernetes.io/name: deployment
     app.kubernetes.io/part-of: cac
     control-plane: controller-manager
-    k8slens-edit-resource-version: v1
   name: cac-controller-manager
   namespace: cac-system
 spec:
-  progressDeadlineSeconds: 600
   replicas: 3
-  revisionHistoryLimit: 10
   selector:
     matchLabels:
       control-plane: controller-manager
-  strategy:
-    rollingUpdate:
-      maxSurge: 25%
-      maxUnavailable: 25%
-    type: RollingUpdate
   template:
     metadata:
       annotations:
         kubectl.kubernetes.io/default-container: manager
-      creationTimestamp: null
       labels:
         control-plane: controller-manager
     spec:
@@ -495,42 +448,29 @@ spec:
                 - linux
       containers:
       - image: huangchengwu6904/hi-app:cac-1691047806
-        imagePullPolicy: IfNotPresent
         livenessProbe:
-          failureThreshold: 3
           httpGet:
             path: /healthz
             port: 8081
-            scheme: HTTP
           initialDelaySeconds: 15
           periodSeconds: 20
-          successThreshold: 1
-          timeoutSeconds: 1
         name: manager
         ports:
         - containerPort: 9443
           name: webhook-server
           protocol: TCP
         - containerPort: 8500
-          protocol: TCP
         readinessProbe:
-          failureThreshold: 3
           httpGet:
             path: /readyz
             port: 8081
-            scheme: HTTP
           initialDelaySeconds: 5
           periodSeconds: 10
-          successThreshold: 1
-          timeoutSeconds: 1
-        resources: {}
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:
             drop:
             - ALL
-        terminationMessagePath: /dev/termination-log
-        terminationMessagePolicy: File
         volumeMounts:
         - mountPath: /tmp/k8s-webhook-server/serving-certs
           name: cert
@@ -541,14 +481,12 @@ spec:
         - --logtostderr=true
         - --v=0
         image: gcr.io/kubebuilder/kube-rbac-proxy:v0.13.1
-        imagePullPolicy: IfNotPresent
         name: kube-rbac-proxy
         ports:
         - containerPort: 8443
           name: https
           protocol: TCP
         - containerPort: 8500
-          protocol: TCP
         resources:
           limits:
             cpu: 500m
@@ -561,14 +499,8 @@ spec:
           capabilities:
             drop:
             - ALL
-        terminationMessagePath: /dev/termination-log
-        terminationMessagePolicy: File
-      dnsPolicy: ClusterFirst
-      restartPolicy: Always
-      schedulerName: default-scheduler
       securityContext:
         runAsNonRoot: true
-      serviceAccount: cac-controller-manager
       serviceAccountName: cac-controller-manager
       terminationGracePeriodSeconds: 10
       volumes:
@@ -580,7 +512,6 @@ spec:
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  generation: 1
   labels:
     app.kubernetes.io/component: certificate
     app.kubernetes.io/created-by: cac
@@ -598,18 +529,6 @@ spec:
     kind: Issuer
     name: cac-selfsigned-issuer
   secretName: webhook-server-cert
-status:
-  conditions:
-  - lastTransitionTime: "2023-08-30T09:33:07Z"
-    message: Certificate is up to date and has not expired
-    observedGeneration: 1
-    reason: Ready
-    status: "True"
-    type: Ready
-  notAfter: "2023-11-28T09:33:07Z"
-  notBefore: "2023-08-30T09:33:07Z"
-  renewalTime: "2023-10-29T09:33:07Z"
-  revision: 1
 ---
 apiVersion: cert-manager.io/v1
 kind: Issuer
@@ -625,18 +544,13 @@ metadata:
   namespace: cac-system
 spec:
   selfSigned: {}
-status:
-  conditions:
-  - lastTransitionTime: "2023-08-30T09:33:07Z"
-    observedGeneration: 1
-    reason: IsReady
-    status: "True"
-    type: Ready
 ---
 apiVersion: admissionregistration.k8s.io/v1
 kind: MutatingWebhookConfiguration
 metadata:
-  generation: 2
+  annotations:
+    cert-manager.io/inject-ca-from: cac-system/cac-serving-cert
+  creationTimestamp: null
   labels:
     app.kubernetes.io/component: webhook
     app.kubernetes.io/created-by: cac
@@ -649,18 +563,12 @@ webhooks:
 - admissionReviewVersions:
   - v1
   clientConfig:
-    caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURFVENDQWZtZ0F3SUJBZ0lSQUtxUDZBRnF6S2NweUZuZDBTR2pqcXd3RFFZSktvWklodmNOQVFFTEJRQXcKQURBZUZ3MHlNekE0TXpBd09UTXpNRGRhRncweU16RXhNamd3T1RNek1EZGFNQUF3Z2dFaU1BMEdDU3FHU0liMwpEUUVCQVFVQUE0SUJEd0F3Z2dFS0FvSUJBUUNyS1NpVjNSYzlJOUhYZTJMMjRxYnN4Tmd2dElKUGR0VnJBbkM3CnpLaUc5U3dwSEFyWW1lV0ZPcTAyN01FMkM2N2hpOUZZWFBtOWNFcjZBcmN3VTZNMkE5Q2pUVWpUODJ1aHhtbGYKRGdTemFaWStmQ0d6TmdMeXJDMFIyZE0vYkRCS045V3ZpaVJONFRpd0p4dVgxVVBlYklVZ2xNN3ZPaEoyVk45bgpadzdDYlFuY1cvVlJ5UENpT2lDaXE4OC9hRDM0NnMvZDJqM0tCMGNWdEZCWDJWR091LzQ2bzJIQXBCSktJOHFQCldXU0ZQQWErN0NiQzBmNGFjRVBjRmV4L05zVFM1WEdEZXBPRjFEa2VYQW5Pb1NMNUptUkR4TG5CMVNEaDAyeFcKVEdhaVhmZkYyS2FwcE5pUVlYVGhGZmE2RjBWdkFmazJHa0VjYVpiRWN2UzFtWUIzQWdNQkFBR2pnWVV3Z1lJdwpEZ1lEVlIwUEFRSC9CQVFEQWdXZ01Bd0dBMVVkRXdFQi93UUNNQUF3WWdZRFZSMFJBUUgvQkZnd1ZvSWlZMkZqCkxYZGxZbWh2YjJzdGMyVnlkbWxqWlM1allXTXRjM2x6ZEdWdExuTjJZNEl3WTJGakxYZGxZbWh2YjJzdGMyVnkKZG1salpTNWpZV010YzNsemRHVnRMbk4yWXk1amJIVnpkR1Z5TG14dlkyRnNNQTBHQ1NxR1NJYjNEUUVCQ3dVQQpBNElCQVFBc1ExbERmTjRsclk3NEtrVnpBdFhGaHpHaEtwMGV6U2NYdkZ0TDc3d1lOTnUzZERWUENpd2RxZTRXCmtxR3V6NnB5MlppSW44cjJnczlkNVBFa2lQMFBNWE9XVTNBcWt6S1VoWEpZWUxYL2FFM054Y2h6U1JseFFhcDEKWkdRc3hYbDVyTDNQazBjcDZMUDRPdnVpanNEbkRSWlIwdlF3S3FRcUt3Qm1laUJDaWxjZGR0QUJickkrTXBYNwpCeitXWkc5VzRkRXZzd1VWZm9kSkVtRDlyMThZbXpEdHVwMXdjS1E1NTdJeWJuakYyUlkwYTdvd2NWVFFYbTJYCjViYVBIT2JyenJRYnk4NDRwT3BNZnlDeEl1akFRTG1xRXZ5NjhMUWVBSVVCaHFXd0VYSEVQanMwMmJvS3QzbDkKOE8xOFc2NW1TR0orWjZZaTFxNm5Sc3dySjhWegotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==
     service:
       name: cac-webhook-service
       namespace: cac-system
       path: /mutate-cac-keli-vip-v1-cacroute
-      port: 443
   failurePolicy: Fail
-  matchPolicy: Equivalent
   name: mcacroute.kb.io
-  namespaceSelector: {}
-  objectSelector: {}
-  reinvocationPolicy: Never
   rules:
   - apiGroups:
     - cac.keli.vip
@@ -671,14 +579,14 @@ webhooks:
     - UPDATE
     resources:
     - cacroutes
-    scope: '*'
   sideEffects: None
-  timeoutSeconds: 10
 ---
 apiVersion: admissionregistration.k8s.io/v1
 kind: ValidatingWebhookConfiguration
 metadata:
-  generation: 2
+  annotations:
+    cert-manager.io/inject-ca-from: cac-system/cac-serving-cert
+  creationTimestamp: null
   labels:
     app.kubernetes.io/component: webhook
     app.kubernetes.io/created-by: cac
@@ -691,17 +599,12 @@ webhooks:
 - admissionReviewVersions:
   - v1
   clientConfig:
-    caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURFVENDQWZtZ0F3SUJBZ0lSQUtxUDZBRnF6S2NweUZuZDBTR2pqcXd3RFFZSktvWklodmNOQVFFTEJRQXcKQURBZUZ3MHlNekE0TXpBd09UTXpNRGRhRncweU16RXhNamd3T1RNek1EZGFNQUF3Z2dFaU1BMEdDU3FHU0liMwpEUUVCQVFVQUE0SUJEd0F3Z2dFS0FvSUJBUUNyS1NpVjNSYzlJOUhYZTJMMjRxYnN4Tmd2dElKUGR0VnJBbkM3CnpLaUc5U3dwSEFyWW1lV0ZPcTAyN01FMkM2N2hpOUZZWFBtOWNFcjZBcmN3VTZNMkE5Q2pUVWpUODJ1aHhtbGYKRGdTemFaWStmQ0d6TmdMeXJDMFIyZE0vYkRCS045V3ZpaVJONFRpd0p4dVgxVVBlYklVZ2xNN3ZPaEoyVk45bgpadzdDYlFuY1cvVlJ5UENpT2lDaXE4OC9hRDM0NnMvZDJqM0tCMGNWdEZCWDJWR091LzQ2bzJIQXBCSktJOHFQCldXU0ZQQWErN0NiQzBmNGFjRVBjRmV4L05zVFM1WEdEZXBPRjFEa2VYQW5Pb1NMNUptUkR4TG5CMVNEaDAyeFcKVEdhaVhmZkYyS2FwcE5pUVlYVGhGZmE2RjBWdkFmazJHa0VjYVpiRWN2UzFtWUIzQWdNQkFBR2pnWVV3Z1lJdwpEZ1lEVlIwUEFRSC9CQVFEQWdXZ01Bd0dBMVVkRXdFQi93UUNNQUF3WWdZRFZSMFJBUUgvQkZnd1ZvSWlZMkZqCkxYZGxZbWh2YjJzdGMyVnlkbWxqWlM1allXTXRjM2x6ZEdWdExuTjJZNEl3WTJGakxYZGxZbWh2YjJzdGMyVnkKZG1salpTNWpZV010YzNsemRHVnRMbk4yWXk1amJIVnpkR1Z5TG14dlkyRnNNQTBHQ1NxR1NJYjNEUUVCQ3dVQQpBNElCQVFBc1ExbERmTjRsclk3NEtrVnpBdFhGaHpHaEtwMGV6U2NYdkZ0TDc3d1lOTnUzZERWUENpd2RxZTRXCmtxR3V6NnB5MlppSW44cjJnczlkNVBFa2lQMFBNWE9XVTNBcWt6S1VoWEpZWUxYL2FFM054Y2h6U1JseFFhcDEKWkdRc3hYbDVyTDNQazBjcDZMUDRPdnVpanNEbkRSWlIwdlF3S3FRcUt3Qm1laUJDaWxjZGR0QUJickkrTXBYNwpCeitXWkc5VzRkRXZzd1VWZm9kSkVtRDlyMThZbXpEdHVwMXdjS1E1NTdJeWJuakYyUlkwYTdvd2NWVFFYbTJYCjViYVBIT2JyenJRYnk4NDRwT3BNZnlDeEl1akFRTG1xRXZ5NjhMUWVBSVVCaHFXd0VYSEVQanMwMmJvS3QzbDkKOE8xOFc2NW1TR0orWjZZaTFxNm5Sc3dySjhWegotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==
     service:
       name: cac-webhook-service
       namespace: cac-system
       path: /validate-cac-keli-vip-v1-cacroute
-      port: 443
   failurePolicy: Fail
-  matchPolicy: Equivalent
   name: vcacroute.kb.io
-  namespaceSelector: {}
-  objectSelector: {}
   rules:
   - apiGroups:
     - cac.keli.vip
@@ -712,43 +615,4 @@ webhooks:
     - UPDATE
     resources:
     - cacroutes
-    scope: '*'
   sideEffects: None
-  timeoutSeconds: 10
----
-apiVersion: cac.keli.vip/v1
-kind: CacRoute
-metadata:
-  name: app-cac
-  namespace: cac-system
-spec:
-  lsb: {{ .Values.wan_ip }}
-  stream:
-    - backend:
-        acl:
-          - allow all
-        lsbPort: 80
-        namespace: default
-        serviceName: my-service
-        servicePort: 80
-      protocol: TCP
----
-apiVersion: metallb.io/v1beta1
-kind: IPAddressPool
-metadata:
-  name: first-wan
-  namespace: metallb-system
-spec:
-  addresses:
-    - "{{ .Values.wan_ip }}-{{ .Values.wan_ip }}"
-  autoAssign: true
-  avoidBuggyIPs: true
----
-apiVersion: metallb.io/v1beta1
-kind: L2Advertisement
-metadata:
-  name: example
-  namespace: metallb-system
-spec:
-  ipAddressPools:
-    - first-wan
