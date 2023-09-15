@@ -18,6 +18,14 @@ spec:
         - name: mariadb-persistent-storage
           persistentVolumeClaim:
             claimName: mariadb-pvc
+        - name: mariadb-conf
+          configMap:
+            name: mariadb-conf
+            items:
+              - key: 50-server.cnf
+                path: 50-server.cnf
+            defaultMode: 420
+
       containers:
         - name: mariadb
           image: {{ .Values.image }}
@@ -37,5 +45,9 @@ spec:
           volumeMounts:
             - name: mariadb-persistent-storage
               mountPath: /var/lib/mysql
+            - name: mariadb-conf
+              mountPath: /etc/mysql/mariadb.conf.d/50-server.cnf
+              subPath: 50-server.cnf
+              
           imagePullPolicy: Always
       restartPolicy: Always

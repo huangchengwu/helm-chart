@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mariadb-conf
+  namespace: {{ .Release.Namespace }}
+
+data:
+  50-server.cnf: |-
+    [server]
+    [mariadbd]
+    pid-file                = /run/mysqld/mysqld.pid
+    basedir                 = /usr
+    key_buffer_size        = 128M
+    max_allowed_packet     = 1G
+    thread_stack           = 192K
+    thread_cache_size      = 8
+    myisam_recover_options = BACKUP
+    max_connections        = 2048
+    table_cache            = 64
+    general_log_file       = /var/log/mysql/mysql.log
+    general_log            = 1
+    server-id              = 1
+    log_bin                = /var/log/mysql/mysql-bin.log
+    expire_logs_days        = 10
+    max_binlog_size        = 100M
+    character-set-server  = utf8mb4
+    collation-server      = utf8mb4_general_ci
+    [embedded]
+    [mariadbd]
+    [mariadb-11.1]
