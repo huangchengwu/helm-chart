@@ -1,3 +1,3 @@
-storageClassName: csi-cephrdb-sc1
+storageClassName: csi-cephfs-sc
 image: skywalking
 storageSite: 10Gi

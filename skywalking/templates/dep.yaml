@@ -14,7 +14,25 @@ spec:
       labels:
         app: elasticsearch
     spec:
-
+      initContainers:
+        - name: init-container
+          image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.4.2
+          command:
+            - sh
+            - '-c'
+            - '-x'
+            - |
+              chown -R 1000.1000   /usr/share/elasticsearch/data
+          resources: {}
+          volumeMounts:
+            - name: skywalking-pvc
+              mountPath:  /usr/share/elasticsearch/data
+              
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          imagePullPolicy: Always
+          securityContext:
+            privileged: true
       volumes:
         - name: skywalking-pvc
           persistentVolumeClaim:
