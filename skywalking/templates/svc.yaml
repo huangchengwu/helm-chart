@@ -6,12 +6,19 @@ metadata:
 
 spec:
   ports:
-    - protocol: TCP
+    - name: tcp-12800
+      protocol: TCP
       port: 12800
       targetPort: 12800
+      nodePort: 32666
+    - name: tcp-11800
+      protocol: TCP
+      port: 11800
+      targetPort: 11800
+      nodePort: 32667
   selector:
     app: oap
-  type: ClusterIP
+  type: NodePort
 ---
 apiVersion: v1
 kind: Service
@@ -24,11 +31,10 @@ spec:
     - protocol: TCP
       port: 9200
       targetPort: 9200
-      nodePort: 32666
-      
   selector:
     app: elasticsearch
   type: ClusterIP
+
 ---
 apiVersion: v1
 kind: Service
