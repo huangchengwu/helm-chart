@@ -57,7 +57,7 @@ spec:
         resources:
           requests:
             storage: 10Gi
-        storageClassName: csi-cephrdb-sc-local
+        storageClassName:  {{ .Values.storageClassName }}
         volumeMode: Filesystem
       status:
         phase: Pending

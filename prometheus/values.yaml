@@ -1,1 +1,1 @@
-storageClassName: csi-cephfs-sc
+storageClassName:  csi-cephrdb-sc1

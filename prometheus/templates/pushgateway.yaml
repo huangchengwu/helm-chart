@@ -40,7 +40,7 @@ spec:
   revisionHistoryLimit: 10
   volumeClaimTemplates:
   - metadata:
-      name: pushgateway
+      name: pushgateway-pvc
     spec:
       accessModes: [ "ReadWriteOnce" ]
       storageClassName: "{{ .Values.storageClassName }}"
