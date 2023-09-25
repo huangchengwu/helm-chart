@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: pushgateway
+  namespace: {{ .Release.Namespace }}
+
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: pushgateway
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: pushgateway
+    spec:
+      containers:
+        - name: pushgateway
+          image: prom/pushgateway
+          ports:
+            - name: pushgateway
+              containerPort: 9091
+              protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          imagePullPolicy: Always
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 10
+      dnsPolicy: ClusterFirst
+      securityContext: {}
+      schedulerName: default-scheduler
+  serviceName: pushgateway
+  podManagementPolicy: OrderedReady
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      partition: 0
+  revisionHistoryLimit: 10
+  volumeClaimTemplates:
+  - metadata:
+      name: pushgateway
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: "{{ .Values.storageClassName }}"
+      resources:
+        requests:
+          storage: 10Gi

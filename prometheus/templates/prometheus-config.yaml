@@ -1,0 +1,400 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-config
+  namespace: {{ .Release.Namespace }}
+data:
+  alertmanager.yml: |
+    route:
+      group_by: ['alertname']
+      group_wait: 30s
+      group_interval: 5m
+      repeat_interval: 1h
+      receiver: 'web.hook'
+    receivers:
+      - name: 'web.hook'
+        webhook_configs:
+          - url: 'http://127.0.0.1:5001/'
+    inhibit_rules:
+      - source_match:
+          severity: 'critical'
+        target_match:
+          severity: 'warning'
+        equal: ['alertname', 'dev', 'instance']
+  grafana.ini: >-
+    [paths]
+
+    [server]
+
+    [server.custom_response_headers]
+
+    [database]
+
+    [datasources]
+
+    [remote_cache]
+
+    [dataproxy]
+
+    [analytics]
+
+    [security]
+
+    [security.encryption]
+
+    [snapshots]
+
+    [dashboards]
+
+    [users]
+
+    [secretscan]
+
+    [service_accounts]
+
+    [auth]
+
+    [auth.anonymous]
+
+    [auth.github]
+
+    [auth.gitlab]
+
+    [auth.google]
+
+    [auth.grafana_com]
+
+    [auth.azuread]
+
+    [auth.okta]
+
+    [auth.generic_oauth]
+
+    [auth.basic]
+
+    [auth.proxy]
+
+    [auth.jwt]
+
+    [auth.ldap]
+
+    [aws]
+
+    [azure]
+
+    [rbac]
+
+    [smtp]
+
+    [emails]
+
+    [log]
+
+    [log.console]
+
+    [log.file]
+
+    [log.syslog]
+
+    [log.frontend]
+
+    [quota]
+
+    [unified_alerting]
+
+    [unified_alerting.reserved_labels]
+
+    [unified_alerting.state_history]
+
+    [unified_alerting.state_history.external_labels]
+
+    [alerting]
+
+    [annotations]
+
+    [annotations.dashboard]
+
+    [annotations.api]
+
+    [explore]
+
+    [help]
+
+    [profile]
+
+    [news]
+
+    [query]
+
+    [query_history]
+
+    [metrics]
+
+    [metrics.environment_info]
+
+    [metrics.graphite]
+
+    [grafana_com]
+
+    [tracing.jaeger]
+
+    [tracing.opentelemetry]
+
+    [tracing.opentelemetry.jaeger]
+
+    [tracing.opentelemetry.otlp]
+
+    [external_image_storage]
+
+    [external_image_storage.s3]
+
+    [external_image_storage.webdav]
+
+    [external_image_storage.gcs]
+
+    [external_image_storage.azure_blob]
+
+    [external_image_storage.local]
+
+    [rendering]
+
+    [panels]
+
+    [plugins]
+
+    [live]
+
+    [plugin.grafana-image-renderer]
+
+    [support_bundles]
+
+    [enterprise]
+
+    [feature_toggles]
+
+    [date_formats]
+
+    [expressions]
+
+    [geomap]
+
+    [navigation.app_sections]
+
+    [navigation.app_standalone_pages]
+
+    [secure_socks_datasource_proxy]
+
+    [feature_management]
+
+    hidden_toggles =
+
+    read_only_toggles =
+
+    grafana-844577948d-m6b45:/etc/grafana$ cat grafana.ini |grep -v "^#"|grep -v
+    "^$"|grep -v "^;"|grep -v "^$"
+
+    [paths]
+
+    [server]
+
+    [server.custom_response_headers]
+
+    [database]
+
+    [datasources]
+
+    [remote_cache]
+
+    [dataproxy]
+
+    [analytics]
+
+    [security]
+
+    [security.encryption]
+
+    [snapshots]
+
+    [dashboards]
+
+    [users]
+
+    [secretscan]
+
+    [service_accounts]
+
+    [auth]
+
+    [auth.anonymous]
+
+    [auth.github]
+
+    [auth.gitlab]
+
+    [auth.google]
+
+    [auth.grafana_com]
+
+    [auth.azuread]
+
+    [auth.okta]
+
+    [auth.generic_oauth]
+
+    [auth.basic]
+
+    [auth.proxy]
+
+    [auth.jwt]
+
+    [auth.ldap]
+
+    [aws]
+
+    [azure]
+
+    [rbac]
+
+    [smtp]
+
+    [emails]
+
+    [log]
+
+    [log.console]
+
+    [log.file]
+
+    [log.syslog]
+
+    [log.frontend]
+
+    [quota]
+
+    [unified_alerting]
+
+    [unified_alerting.reserved_labels]
+
+    [unified_alerting.state_history]
+
+    [unified_alerting.state_history.external_labels]
+
+    [alerting]
+
+    [annotations]
+
+    [annotations.dashboard]
+
+    [annotations.api]
+
+    [explore]
+
+    [help]
+
+    [profile]
+
+    [news]
+
+    [query]
+
+    [query_history]
+
+    [metrics]
+
+    [metrics.environment_info]
+
+    [metrics.graphite]
+
+    [grafana_com]
+
+    [tracing.jaeger]
+
+    [tracing.opentelemetry]
+
+    [tracing.opentelemetry.jaeger]
+
+    [tracing.opentelemetry.otlp]
+
+    [external_image_storage]
+
+    [external_image_storage.s3]
+
+    [external_image_storage.webdav]
+
+    [external_image_storage.gcs]
+
+    [external_image_storage.azure_blob]
+
+    [external_image_storage.local]
+
+    [rendering]
+
+    [panels]
+
+    [plugins]
+
+    [live]
+
+    [plugin.grafana-image-renderer]
+
+    [support_bundles]
+
+    [enterprise]
+
+    [feature_toggles]
+
+    [date_formats]
+
+    [expressions]
+
+    [geomap]
+
+    [navigation.app_sections]
+
+    [navigation.app_standalone_pages]
+
+    [secure_socks_datasource_proxy]
+
+    [feature_management]
+
+    hidden_toggles =
+
+    read_only_toggles =
+  prometheus.yml: >-
+    # my global config
+
+    global:
+      scrape_interval: 15s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
+      evaluation_interval: 15s # Evaluate rules every 15 seconds. The default is every 1 minute.
+      # scrape_timeout is set to the global default (10s).
+
+    # Alertmanager configuration
+
+    alerting:
+      alertmanagers:
+        - static_configs:
+            - targets:
+              # - alertmanager:9093
+
+    # Load rules once and periodically evaluate them according to the global
+    'evaluation_interval'.
+
+    rule_files:
+      # - "first_rules.yml"
+      # - "second_rules.yml"
+
+    # A scrape configuration containing exactly one endpoint to scrape:
+
+    # Here it's Prometheus itself.
+
+    scrape_configs:
+      # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
+      - job_name: "prometheus"
+        static_configs:
+          - targets: ["prometheus-0.prometheus.test:9090","prometheus-1.prometheus.test:9090","prometheus-2.prometheus.test:9090"]
+      - job_name: "pushgateway"
+        static_configs:
+          - targets: ["pushgateway-0.pushgateway.test:9091","pushgateway-1.pushgateway.test:9091","pushgateway-2.pushgateway.test:9091"]
+            labels:
+                instance: pushgateway
+                

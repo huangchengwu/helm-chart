@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: alertmanager
+  namespace: {{ .Release.Namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: alertmanager
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: alertmanager
+      annotations:
+        kubectl.kubernetes.io/restartedAt: '2023-09-25T01:48:16Z'
+    spec:
+      volumes:
+        - name: alertmanager-config
+          configMap:
+            name: prometheus-config
+            items:
+              - key: alertmanager.yml
+                path: alertmanager.yml
+            defaultMode: 420
+      containers:
+        - name: alertmanager
+          image: prom/alertmanager
+          ports:
+            - containerPort: 9093
+              protocol: TCP
+            - containerPort: 9094
+              protocol: TCP
+          resources: {}
+          volumeMounts:
+            - name: alertmanager-config
+              mountPath: /etc/alertmanager/alertmanager.yml
+              subPath: alertmanager.yml
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          imagePullPolicy: Always
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      securityContext: {}
+      schedulerName: default-scheduler
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 25%
+  revisionHistoryLimit: 10
+  progressDeadlineSeconds: 600
