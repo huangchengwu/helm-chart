@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kibana
+  namespace: {{ .Release.Namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kibana
+  template:
+    metadata:
+      labels:
+        app: kibana
+    spec:
+      containers:
+        - name: kibana
+          image: kibana:7.17.13
+          ports:
+            - containerPort: 5601            
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: logstash
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: logstash
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: logstash
+  template:
+    metadata:
+      labels:
+        app: logstash
+    spec:
+      containers:
+      - name: logstash
+        image: logstash:7.17.13
+        command: ["/bin/bash","-c","while true; do echo 1; sleep 1; done"]
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name:  filebeat
+  namespace: {{ .Release.Namespace }}
+  labels:
+    k8s-app: filebeat
+spec:
+  selector:
+    matchLabels:
+      name: filebeat
+  template:
+    metadata:
+      labels:
+        name: filebeat
+    spec:
+      containers:
+      - name: filebeat
+        image: elastic/filebeat:7.17.13
+        volumeMounts:
+        - name: varlog
+          mountPath: /var/log
+        - name: varlibdockercontainers
+          mountPath: /var/lib/docker/containers
+          readOnly: true
+
+

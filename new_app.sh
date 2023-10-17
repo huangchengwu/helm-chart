@@ -5,7 +5,6 @@ rm -rf $1/charts/*
 rm -rf $1/.helmignore
 cat > $1/values.yaml<<EOF
 storageClassName: csi-cephrdb-sc1
-image: $1
 storageSite: 50Gi
 EOF
 cat prometheus/Chart.yaml|grep -v "^#"|grep -v "^$" >$1/c.yaml

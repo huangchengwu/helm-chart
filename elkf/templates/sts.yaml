@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: elasticsearch
+  namespace: {{ .Release.Namespace }}
+spec:
+  selector:
+    matchLabels:
+      app: elasticsearch
+  serviceName: "elasticsearch"
+  replicas:  1
+  template:
+    metadata:
+      labels:
+        app: elasticsearch 
+    spec:
+      containers:
+      - name: elasticsearch
+        image:   elasticsearch:7.17.13
+        ports:
+        - containerPort: 9200
+          name: es-9200
+        - containerPort: 9300
+          name: es-9300
+        volumeMounts:
+        - name: es
+          mountPath: /usr/share/nginx/html
+  volumeClaimTemplates:
+  - metadata:
+      name: es
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: "{{ .Values.storageClassName }}"
+      resources:
+        requests:
+          storage: "{{ .Values.storageSite }}"
