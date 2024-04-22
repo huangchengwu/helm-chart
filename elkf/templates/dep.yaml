@@ -1,3 +1,24 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: filebeat-config
+  namespace: {{ .Release.Namespace }}
+data:
+  filebeat.yml: |
+    setup.template.name: "my-custom-template"
+    setup.template.pattern: "my-custom-index-*"
+    filebeat.inputs:
+    - type: log
+      enabled: true
+      paths:
+        - /var/log/containers/*.log
+    output.elasticsearch:
+      hosts: ["elasticsearch:9200"]
+      index: "my-custom-index-%{+yyyy.MM.dd}"
+
+
+---
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -17,29 +38,10 @@ spec:
         - name: kibana
           image: kibana:7.17.13
           ports:
-            - containerPort: 5601            
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: logstash
-  namespace: {{ .Release.Namespace }}
-  labels:
-    app: logstash
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: logstash
-  template:
-    metadata:
-      labels:
-        app: logstash
-    spec:
-      containers:
-      - name: logstash
-        image: logstash:7.17.13
-        command: ["/bin/bash","-c","while true; do echo 1; sleep 1; done"]
+            - containerPort: 5601      
+          env:
+          - name: ELASTICSEARCH_HOSTS
+            value: http://elasticsearch:9200
 ---
 apiVersion: apps/v1
 kind: DaemonSet
@@ -57,14 +59,39 @@ spec:
       labels:
         name: filebeat
     spec:
+      hostNetwork: true  
       containers:
       - name: filebeat
         image: elastic/filebeat:7.17.13
+        command: ["filebeat", "-e","-v","-c","/filebeat/filebeat.yml"]
+        securityContext:
+          runAsUser: 0
         volumeMounts:
-        - name: varlog
-          mountPath: /var/log
-        - name: varlibdockercontainers
-          mountPath: /var/lib/docker/containers
+        - name: varlogcontainers
+          mountPath: /var/log/containers
+        - name: varlogcontainers2
+          mountPath: /var/log/pods
+
+
+
+        - name: config-volume
+          mountPath: /filebeat/filebeat.yml
+          subPath: filebeat.yml
           readOnly: true
+      volumes:
+      - name: varlogcontainers
+        hostPath:
+          path: /var/log/containers
+          type: ""
+      - name: varlogcontainers2
+        hostPath:
+          path: /var/log/pods
+          type: ""
 
-
+      - name: config-volume
+        configMap:
+          name: filebeat-config 
+          items:
+            - key: filebeat.yml
+              path: filebeat.yml
+          defaultMode: 420

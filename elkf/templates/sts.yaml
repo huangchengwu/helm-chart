@@ -17,6 +17,9 @@ spec:
       containers:
       - name: elasticsearch
         image:   elasticsearch:7.17.13
+        env:
+        - name: discovery.type
+          value: single-node
         ports:
         - containerPort: 9200
           name: es-9200
@@ -24,7 +27,7 @@ spec:
           name: es-9300
         volumeMounts:
         - name: es
-          mountPath: /usr/share/nginx/html
+          mountPath: /data
   volumeClaimTemplates:
   - metadata:
       name: es
@@ -34,3 +37,6 @@ spec:
       resources:
         requests:
           storage: "{{ .Values.storageSite }}"
+
+
+

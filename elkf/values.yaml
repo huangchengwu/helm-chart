@@ -1,2 +1,2 @@
-storageClassName:  csi-cephrdb-sc1
+storageClassName:  csi-cephfs-sc
 storageSite: 50Gi

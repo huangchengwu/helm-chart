@@ -1,11 +1,6 @@
-build:
-	rm -rf chart/*.tgz
-	rm -rf chart/index.yaml
-	rm -rf *.tgz
-	helm package mysql
-	helm package redis
-	mv *.tgz chart
-	helm repo index chart --url https://huangchengwu.github.io/helm-chart/chart
-	git add *
-	git commit -m "add"
-	git push -f 
+deploy-elkf:
+	helm upgrade --install my-elkf  ./elkf --namespace elkf --create-namespace 
+deploy-jenkins:
+
+	helm upgrade --install new-jenkins  ./jenkins --namespace jenkins --create-namespace 
+

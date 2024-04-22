@@ -18,10 +18,6 @@ spec:
           hostPath:
             path: /var/jenkins_home
             type: ''
-        - name: docker-data
-          hostPath:
-            path: /var/run/docker/containerd/
-            type: ''
       initContainers:
         - name: init-container
           image: ubuntu
@@ -49,4 +45,3 @@ spec:
               mountPath: /var/jenkins_home
           securityContext:
             privileged: true
-      nodeName: {{ .Values.nodeName }}
