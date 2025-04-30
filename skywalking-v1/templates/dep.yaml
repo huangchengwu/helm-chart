@@ -1,0 +1,360 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: elasticsearch
+  namespace: {{ .Release.Namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: elasticsearch
+  template:
+    metadata:
+      labels:
+        app: elasticsearch
+    spec:
+      initContainers:
+        - name: init-container
+          image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.4.2
+          command:
+            - sh
+            - '-c'
+            - '-x'
+            - |
+              chown -R 1000.1000   /usr/share/elasticsearch/data
+          resources: {}
+          volumeMounts:
+            - name: skywalking-pvc
+              mountPath:  /usr/share/elasticsearch/data
+              
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          imagePullPolicy: Always
+          securityContext:
+            privileged: true
+      volumes:
+        - name: skywalking-pvc
+          persistentVolumeClaim:
+            claimName: skywalking-pvc
+
+      containers:
+        - name: elasticsearch
+          image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.4.2
+          ports:
+            - containerPort: 9200
+              protocol: TCP
+          env:
+            - name: discovery.type
+              value: single-node
+            - name: bootstrap.memory_lock
+              value: 'true'
+            - name: ES_JAVA_OPTS
+              value: '-Xms512m -Xmx512m'
+
+
+          volumeMounts:
+            - name: skywalking-pvc
+              mountPath:  /usr/share/elasticsearch/data
+          readinessProbe:
+            exec:
+              command:
+                - sh
+                - '-c'
+                - curl --silent --fail localhost:9200/_cluster/health || exit 1
+            initialDelaySeconds: 30
+            timeoutSeconds: 10
+            periodSeconds: 30
+            successThreshold: 1
+            failureThreshold: 3
+          securityContext:
+            capabilities:
+              add:
+                - IPC_LOCK
+      restartPolicy: Always
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: skywalking-ui
+  namespace: skywalking
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: skywalking-ui
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: skywalking-ui
+    spec:
+      containers:
+        - name: skywalking-ui
+          image: apache/skywalking-ui:8.9.1
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          env:
+            - name: TZ
+              value: Asia/Shanghai
+            - name: SW_OAP_ADDRESS
+              value: http://oap:12800
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          imagePullPolicy: IfNotPresent
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      securityContext: {}
+      schedulerName: default-scheduler
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 25%
+  revisionHistoryLimit: 10
+  progressDeadlineSeconds: 600
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: oap
+  namespace: skywalking
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: skywalking-oap
+  template:
+    metadata:
+      labels:
+        app: skywalking-oap
+    spec:
+      volumes:
+        - name: config
+          configMap:
+            name: alarm-settings
+            defaultMode: 420
+      containers:
+        - name: oap
+          image: apache/skywalking-oap-server:8.9.1
+          ports:
+            - containerPort: 12800
+              protocol: TCP
+            - containerPort: 11800
+              protocol: TCP
+          env:
+            - name: TZ
+              value: Asia/Shanghai
+            - name: SW_STORAGE
+              value: elasticsearch
+            - name: SW_STORAGE_ES_CLUSTER_NODES
+              value: elasticsearch:9200
+          resources: {}
+          volumeMounts:
+            - name: config
+              mountPath: /skywalking/config/alarm-settings.yml
+              subPath: alarm-settings.yml
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          imagePullPolicy: IfNotPresent
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      securityContext: {}
+      schedulerName: default-scheduler
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 25%
+  revisionHistoryLimit: 10
+  progressDeadlineSeconds: 600
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: skywalking-pvc
+  namespace: skywalking
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 500Gi
+  storageClassName: csi-cephfs-sc
+  volumeMode: Filesystem
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: alarm-settings
+  namespace: skywalking
+spec: {}
+data:
+  alarm-settings.yml: |
+    # 示例告警规则
+    rules:
+      # 唯一的规则名，必须以 `_rule` 结尾
+      service_resp_time_rule:
+        metrics-name: service_resp_time
+        op: ">"
+        threshold: 1000
+        period: 10
+        count: 3
+        silence-period: 5
+        message: 服务 {name} 的响应时间在过去10分钟中有3分钟超过了1000毫秒。
+      
+      service_sla_rule:
+        metrics-name: service_sla
+        op: "<"
+        threshold: 8000
+        period: 10
+        count: 2
+        silence-period: 3
+        message: 服务 {name} 的成功率在过去10分钟中有2分钟低于80%。
+
+      service_resp_time_percentile_rule:
+        metrics-name: service_percentile
+        op: ">"
+        threshold: 1000,1000,1000,1000,1000
+        period: 10
+        count: 3
+        silence-period: 5
+        message: 服务 {name} 在过去10分钟中有3分钟触发了百分位响应时间告警，p50、p75、p90、p95、p99 超过1000毫秒。
+
+      service_instance_resp_time_rule:
+        metrics-name: service_instance_resp_time
+        op: ">"
+        threshold: 1000
+        period: 10
+        count: 2
+        silence-period: 5
+        message: 服务实例 {name} 的响应时间在过去10分钟中有2分钟超过了1000毫秒。
+
+      database_access_resp_time_rule:
+        metrics-name: database_access_resp_time
+        threshold: 1000
+        op: ">"
+        period: 10
+        count: 2
+        message: 数据库访问 {name} 的响应时间在过去10分钟中有2分钟超过了1000毫秒。
+
+      endpoint_relation_resp_time_rule:
+        metrics-name: endpoint_relation_resp_time
+        threshold: 1000
+        op: ">"
+        period: 10
+        count: 2
+        message: 端点关系 {name} 的响应时间在过去10分钟中有2分钟超过了1000毫秒。
+
+    #  激活端点相关的指标告警会比服务和实例的告警消耗更多内存。
+    #  因为端点数量通常远远多于服务和实例。
+    #
+    #  endpoint_avg_rule:
+    #    metrics-name: endpoint_avg
+    #    op: ">"
+    #    threshold: 1000
+    #    period: 10
+    #    count: 2
+    #    silence-period: 5
+    #    message: 端点 {name} 的平均响应时间在过去10分钟中有2分钟超过了1000毫秒。
+
+    webhooks:
+    #  - http://127.0.0.1/notify/
+    - 'http://plugin-app:8080/notify'
+    #  - http://127.0.0.1/go-wechat/
+
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: plugin-app-pvc
+  namespace: skywalking
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 50Gi
+  storageClassName: csi-cephfs-sc
+  volumeMode: Filesystem
+  
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: plugin-app
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: plugin-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: plugin-app
+  template:
+    metadata:
+      labels:
+        app: plugin-app
+    spec:
+      containers:
+        - name: plugin-app
+          image: alpine
+          env:
+          - name: TZ
+            value: Asia/Shanghai
+
+          command:
+          - /bin/sh
+          - -c 
+          - /plugin-app/skywalking-webhooks
+          - sleep 100000
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: plugin-app-pvc
+              mountPath:  /plugin-app/
+            - name: script-volume
+              mountPath: /plugin-app/scripts/
+      volumes:
+        - name: plugin-app-pvc
+          persistentVolumeClaim:
+            claimName: plugin-app-pvc
+        - name: script-volume
+          configMap:
+            name: script
+            defaultMode: 0755  
+
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: script
+  namespace: {{ .Release.Namespace }}
+
+data:
+  start.sh: |
+    #!/bin/sh
+    echo "启动脚本"
+    sleep 100000000000
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: plugin-app
+  namespace: {{ .Release.Namespace }}
+spec:
+  selector:
+    app: plugin-app
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+
+

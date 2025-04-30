@@ -1,0 +1,55 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: skywalking-ui
+  namespace: skywalking
+spec:
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+  selector:
+    app: skywalking-ui
+  type: ClusterIP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: oap
+  namespace: skywalking
+spec:
+  ports:
+    - name: tcp-12800
+      protocol: TCP
+      port: 12800
+      targetPort: 12800
+    - name: tcp-11800
+      protocol: TCP
+      port: 11800
+      targetPort: 11800
+  selector:
+    app: skywalking-oap
+  type: ClusterIP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: elasticsearch
+  namespace: skywalking
+spec:
+  ports:
+    - name: http
+      protocol: TCP
+      port: 9200
+      targetPort: 9200
+    - name: transport
+      protocol: TCP
+      port: 9300
+      targetPort: 9300
+  selector:
+    app: elasticsearch
+  type: ClusterIP
+
+
