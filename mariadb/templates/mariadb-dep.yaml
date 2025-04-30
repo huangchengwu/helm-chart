@@ -34,7 +34,7 @@ spec:
               protocol: TCP
           env:
             - name: MYSQL_ROOT_PASSWORD
-              value: {{ .Values.password }}
+              value: "{{ .Values.password }}"
             - name: MYSQL_DATABASE
               value: {{ .Values.database }}
             - name: MYSQL_USER

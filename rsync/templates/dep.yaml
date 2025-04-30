@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rsync
+  namespace: {{ .Release.Namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rsync
+  template:
+    metadata:
+      labels:
+        app: rsync
+    spec:
+      containers:
+        - name: rsync
+          image: {{ .Values.image }} 
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: rsync-data
+              mountPath: /rsync-data
+      volumes:
+        - name: rsync-data
+          persistentVolumeClaim:
+            claimName: rsync-pvc

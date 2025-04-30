@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: influxdb-sts
+  namespace: {{ .Release.Namespace }}
+spec:
+  selector:
+    matchLabels:
+      app: influxdb 
+  serviceName: "influxdb"
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: influxdb  
+    spec:
+      volumes:
+      - name: conf
+        emptyDir: {}
+      - name: config-map
+        configMap:
+          name: influxdb-conf
+      containers:
+        - name: init-influxdb
+          image: influxdb:1.8
+          command:
+          - bash
+          - "-c"
+          - |
+            set -ex
+            cp /mnt/config-map/influxdb.conf  /mnt/conf.d/    
+        
+          volumeMounts:
+          - name: conf
+            mountPath: /mnt/conf.d
+          - name: config-map
+            mountPath: /mnt/config-map
+        - name: influxdb
+          image:  influxdb:1.8
+          command:
+          - bash
+          - "-c"
+          - |
+            sleep 1000000000 
+          ports:
+            - containerPort: 8086
+              name: http
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/influxdb
+            - name: conf
+              mountPath: /etc/influxdb
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: ["ReadWriteMany"]
+        storageClassName: "{{ .Values.storageClassName }}"
+        resources:
+          requests:
+            storage: {{ .Values.storageSite }}

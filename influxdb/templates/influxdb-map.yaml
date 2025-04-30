@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: influxdb-conf
+  namespace: {{ .Release.Namespace }}
+
+data:
+  influxdb.conf: |-
+        bind-address = ":8088"
+        [meta]
+          dir = "/var/lib/influxdb/data"
+        [data]
+          dir = "/var/lib/influxdb/data"
+          wal-dir = "/var/lib/influxdb/wal"
+          wal-fsync-delay = "1ms"
+          index-version = "tsi1"
+          cache-max-memory-size = "48g"
+          cache-snapshot-memory-size = "4096m"
+          max-concurrent-compactions = 12
+          series-id-set-cache-size = 100
+        [coordinator]
+          max-select-point = 1000000
+          max-select-series = 1000000
+        [hinted-handoff]
+          dir = "/var/lib/influxdb/hh"

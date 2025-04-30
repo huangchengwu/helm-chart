@@ -1,0 +1,4 @@
+timeZone: Asia/Shanghai
+LANG: C.UTF-8
+storageClassName:  csi-cephfs-sc
+storageSite: 10Gi

@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: aria2-pro
+  namespace: {{ .Release.Namespace }}
+spec:
+  selector:
+    matchLabels:
+      app: aria2-pro  
+  serviceName: "aria2-pro"
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: aria2-pro  
+    spec:
+      terminationGracePeriodSeconds: 10
+
+      containers:
+        - name: aria2-pro
+          image:  p3terx/aria2-pro
+          ports:
+
+            - containerPort: 6800
+            - containerPort: 6888
+          env:
+            - name: RPC_SECRET
+              value:  "{{ .Values.password }}"
+        #   volumeMounts:
+        #     - name: aria2-pro-pvc
+        #       mountPath: /downloads
+        - name: ariang
+          image: p3terx/ariang
+          ports:
+            - containerPort: 6880
+
+
+  # volumeClaimTemplates:
+  #   - metadata:
+  #       name: aria2-pro-pvc
+  #     spec:
+  #       accessModes: ["ReadWriteOnce"]
+  #       storageClassName: "{{ .Values.storageClassName }}"
+  #       resources:
+  #         requests:
+  #           storage: "{{ .Values.storageSite }}"

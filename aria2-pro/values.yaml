@@ -1,0 +1,3 @@
+storageClassName: csi-cephrdb-sc1
+storageSite: 50Gi
+password: "123.com"
