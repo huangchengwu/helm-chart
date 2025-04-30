@@ -3,7 +3,7 @@ entries:
   cac-system:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2025-04-30T16:43:54.057458+08:00"
+    created: "2025-04-30T16:43:59.568051+08:00"
     dependencies:
     - name: metallb
       repository: https://metallb.github.io/metallb
@@ -14,7 +14,7 @@ entries:
       repository: https://charts.jetstack.io
       version: v1.12.0
     description: A Helm chart for Kubernetes
-    digest: 904f698087beb40c38a00aa2165478f15aae28dec4fb50f04cf713ba18fcfdb4
+    digest: 191833e9fccaae042ae1f7e94591fe9c8f4d6e5b61a80d5ef4ad247e2ca25e28
     name: cac-system
     type: application
     urls:
@@ -23,9 +23,9 @@ entries:
   influxdb:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2025-04-30T16:43:54.057921+08:00"
+    created: "2025-04-30T16:43:59.568262+08:00"
     description: A Helm chart for Kubernetes
-    digest: df0a8b5e40e83239d998f195110e02381ae0a706c22bef61d432ac08720ab7bf
+    digest: 42b28b5230f9bf517394b988b3cd2daef0a0a185a5ec42834220108f76aa1325
     name: influxdb
     type: application
     urls:
@@ -34,9 +34,9 @@ entries:
   jenkins:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2025-04-30T16:43:54.058407+08:00"
+    created: "2025-04-30T16:43:59.56843+08:00"
     description: A Helm chart for Kubernetes
-    digest: ab75192af49f4c76bb8b688a97fbdd2655e17eab00b9b768dd3b3ad3052574b8
+    digest: ddf8b716703cca43836f4ea671a0c909395a488a439a4a82bedfcab81d00a7f2
     name: jenkins
     type: application
     urls:
@@ -45,9 +45,9 @@ entries:
   mariadb:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2025-04-30T16:43:54.058843+08:00"
+    created: "2025-04-30T16:43:59.568616+08:00"
     description: A Helm chart for Kubernetes
-    digest: d1c07f7c1ac9d279b0335dc482bdedd4391f47d0caa78c5bbfa483327f3a7311
+    digest: 682a248835736d2296a55ceb1223e0b0e8f869b34cf6a1353cc6820793f72f45
     name: mariadb
     type: application
     urls:
@@ -64,7 +64,7 @@ entries:
       licenses: Apache-2.0
     apiVersion: v2
     appVersion: 11.3.2
-    created: "2025-04-30T16:43:54.065865+08:00"
+    created: "2025-04-30T16:43:59.57168+08:00"
     dependencies:
     - name: common
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -73,7 +73,7 @@ entries:
       version: 2.x.x
     description: MariaDB Galera is a multi-primary database cluster solution for synchronous
       replication and high availability.
-    digest: d0b649b154c817fbdd914e4f5b549cf9426db146051c3633d34c375f3fb97a07
+    digest: 92cd142995065c4563aab4d0a7e45c9619f494566c42fa97650c420ab7a40508
     home: https://bitnami.com
     icon: https://bitnami.com/assets/stacks/mariadb-galera/img/mariadb-galera-stack-220x234.png
     keywords:
@@ -95,9 +95,9 @@ entries:
   mysql:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2025-04-30T16:43:54.066706+08:00"
+    created: "2025-04-30T16:43:59.571884+08:00"
     description: A Helm chart for Kubernetes
-    digest: efe6c680562a28fb9004490cff71cca36633c7df28ed33f274e4d2206a25dd4b
+    digest: b4116a838af186a659cff1436c7dfabfa43e67a0d99c7372df95282490a8458b
     name: mysql
     type: application
     urls:
@@ -106,9 +106,9 @@ entries:
   nexus3:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2025-04-30T16:43:54.067125+08:00"
+    created: "2025-04-30T16:43:59.57207+08:00"
     description: A Helm chart for Kubernetes
-    digest: e5b7255892fd21366188139ccc09af6f0055e19a0c4a968d9a1b7991b260b137
+    digest: ed505c713d8bf0e88a322d8809debb815c690f57b7369878d35ae6b266f2345b
     name: nexus3
     type: application
     urls:
@@ -117,9 +117,9 @@ entries:
   prometheus:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2025-04-30T16:43:54.069451+08:00"
+    created: "2025-04-30T16:43:59.572262+08:00"
     description: A Helm chart for Kubernetes
-    digest: 5d6d632adc89cf5894110cc72804668d023eff1a6ec08e9377de9008ced77ee8
+    digest: a4cfdaa6041b25b990c588ab85750257195dbe33151d46cfb9da759e3b8debf6
     name: prometheus
     type: application
     urls:
@@ -128,9 +128,9 @@ entries:
   redis:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2025-04-30T16:43:54.070048+08:00"
+    created: "2025-04-30T16:43:59.572432+08:00"
     description: A Helm chart for Kubernetes
-    digest: 240c030417a1f1fdaec8602754609857a2abe8b61c85c61d923bf32569c48553
+    digest: 9c4dcca7086b6264e8b76cbe1d2452fd904296e32e9b445dd8ecef39087c4451
     name: redis
     type: application
     urls:
@@ -139,9 +139,9 @@ entries:
   skywalking-v1:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2025-04-30T16:43:54.070895+08:00"
+    created: "2025-04-30T16:43:59.572623+08:00"
     description: A Helm chart for Kubernetes
-    digest: 92ab4dac23f592ec22a3a4c67afa692e86544cf74f4055acff46587b4dc4c197
+    digest: 50e7704bbeaadabadd54bb2b0b723952664c30b16f461bd5b6e8fe6f509be87d
     name: skywalking-v1
     type: application
     urls:
@@ -150,9 +150,9 @@ entries:
   tdengine:
   - apiVersion: v2
     appVersion: 3.0.2.2
-    created: "2025-04-30T16:43:54.072863+08:00"
+    created: "2025-04-30T16:43:59.573312+08:00"
     description: TDengine Cluster Chart for Kubenetes
-    digest: 7f150f5e088712dd43f3a8ba67c8d503494f09824ab999dc91ce89f5da10db57
+    digest: 58b127eaba6c3210a13834ba4d004b3f413e036a78bdbe574009e1bcc6d4f3bd
     icon: https://www.taosdata.com/images/taosdata-logo.png
     maintainers:
     - email: linhe.huo@gmail.com
@@ -163,4 +163,4 @@ entries:
     urls:
     - https://huangchengwu.github.io/helm-chart/chart/tdengine-3.0.2.tgz
     version: 3.0.2
-generated: "2025-04-30T16:43:54.046865+08:00"
+generated: "2025-04-30T16:43:59.562852+08:00"
